@@ -12,6 +12,8 @@ If Oh SkillOps claims that skills should be managed as code, this repository sho
 
 The goal is to avoid becoming a methodology-only repository. A standard matters when it can be run.
 
+The manual operating loop is defined in [Dogfood Loop](dogfood-loop.md).
+
 ## Current Dogfood Artifacts
 
 ### Process Dogfood
@@ -158,7 +160,7 @@ Examples:
 
 ### 4. Self-Improvement Is Propose-Only
 
-Runtime feedback may produce a candidate patch. It must not directly mutate a production skill.
+Runtime feedback may produce a candidate patch. It must not directly mutate a production skill. The current manual process is specified in [Dogfood Loop](dogfood-loop.md).
 
 The intended flow is:
 
