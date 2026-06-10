@@ -61,7 +61,7 @@ That is intentional. The scout can read the repository and create an issue, but 
 
 ## Activation Requirements
 
-The workflow is safe to commit before credentials are configured. If `ANTHROPIC_API_KEY` is not present, the Claude step is skipped.
+The workflow is safe to commit before credentials are configured. If `ANTHROPIC_API_KEY` is not present, scheduled runs skip the Claude step. Manual `workflow_dispatch` runs still dogfood the repository through a deterministic no-key fallback that creates a reviewable GitHub issue using only `GITHUB_TOKEN`.
 
 To enable it:
 
@@ -74,6 +74,19 @@ To enable it:
 4. Keep branch protection enabled before adding any builder workflow.
 
 If workload identity is used instead of a static Anthropic API key, the workflow may need `id-token: write`. Do not add that permission unless the authentication path requires it.
+
+## No-Key Manual Fallback
+
+Manual dogfooding must not require an external model credential. When the workflow is triggered manually without `ANTHROPIC_API_KEY`, it runs a deterministic fallback that:
+
+- creates a GitHub issue with the normal scout contract
+- records that the no-key path was used
+- points at a concrete current repository gap
+- avoids file edits, branches, commits, pull requests, releases, secrets, and settings
+
+The fallback is intentionally narrow. It is not a replacement for the Claude scout, and it should not pretend to perform model-based repository analysis. Its purpose is to keep the SkillOps loop executable from day one: even a new clone with only GitHub Actions and `GITHUB_TOKEN` can produce reviewable dogfood evidence.
+
+The current fallback points at the first executable standard gap: implementing `skillops lint`.
 
 ## Scout Contract
 

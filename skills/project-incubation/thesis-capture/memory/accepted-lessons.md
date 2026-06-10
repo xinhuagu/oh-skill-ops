@@ -4,3 +4,4 @@
 - Treat self-improvement as propose-only until lint, score, audit, and eval gates exist.
 - Dogfood every major concept as repository-native artifacts before claiming it as a standard.
 - Scheduled self-improvement should start as a scout that creates reviewable issues before any approval-gated builder writes branches or pull requests.
+- Manual dogfood should work without external model credentials through a deterministic no-key fallback that creates reviewable evidence.
