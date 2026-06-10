@@ -1,0 +1,168 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/xinhuagu/oh-skill-ops/schemas/skillops.schema.json",
+  "title": "Oh SkillOps Manifest",
+  "description": "Sidecar manifest for managing agent skills as versioned, reviewable, testable software assets.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name",
+    "owner",
+    "version",
+    "runtime",
+    "scope",
+    "risk",
+    "status",
+    "skill_file"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]*$",
+      "description": "Stable skill identifier. Prefer lowercase ASCII with hyphens for portable shared skills."
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Person, team, or organization responsible for review and maintenance."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][A-Za-z0-9.-]+)?$",
+      "description": "Semantic version for the operational skill package."
+    },
+    "runtime": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Target agent runtimes. Values are intentionally open strings to avoid runtime lock-in."
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["personal", "project", "team", "organization", "plugin"],
+      "description": "Distribution and governance scope."
+    },
+    "risk": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Operational risk class for the skill."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["experimental", "review", "approved", "deprecated", "blocked"],
+      "description": "Lifecycle state of the skill package."
+    },
+    "skill_file": {
+      "type": "string",
+      "minLength": 1,
+      "default": "SKILL.md",
+      "description": "Path to the runtime skill entry point, relative to the package directory."
+    },
+    "allowed_tools": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Tools or tool classes expected by this skill."
+    },
+    "disallowed_tools": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Tools or tool classes this skill should not use."
+    },
+    "mcp_servers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "required": {
+            "type": "boolean",
+            "default": true
+          },
+          "allowed_tools": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "description": "MCP server dependencies and tool expectations."
+    },
+    "evals": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Eval files relative to the skill package directory."
+    },
+    "dependencies": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Skill, package, script, model, or runtime dependencies."
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["manual", "generated", "compiled", "evolved", "imported"]
+        },
+        "created_from": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "description": "Origin and evidence for the skill package."
+    },
+    "references": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Reference files or URLs used to create or review the skill."
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["string", "boolean", "number", "array", "object", "null"]
+      },
+      "description": "Runtime-specific compatibility notes. Kept open to avoid locking the project to one agent client."
+    }
+  }
+}

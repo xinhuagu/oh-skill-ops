@@ -263,6 +263,31 @@ This supports an Oh SkillOps rule: runtime systems may propose skill edits, but 
 
 ## Project Direction Implications
 
+
+### Competitive Positioning Update
+
+Recent research makes the self-improving-skill area more crowded than the initial project frame suggested. SkillOpt treats a skill document as trainable external state for a frozen agent. It uses a separate optimizer model to propose bounded add/delete/replace edits and accepts an edit only when it improves held-out validation. That is close to the most ambitious version of `skillops evolve`, but focused on optimizing an individual skill artifact against eval feedback.
+
+Source:
+
+- SkillOpt: https://arxiv.org/abs/2605.23904
+
+Another paper, also named SkillOps, frames skill-library maintenance as a method-agnostic plug-in layer. It introduces typed skill contracts, a hierarchical ecosystem graph, and maintenance diagnostics across utility, compatibility, risk, and validation dimensions. This overlaps with the Oh SkillOps governance direction and creates a naming/positioning collision that the project should acknowledge.
+
+Source:
+
+- SkillOps: Managing LLM Agent Skill Libraries as Self-Maintaining Software Ecosystems: https://arxiv.org/abs/2605.13716
+
+The practical implication is that Oh SkillOps should avoid competing head-on as a skill optimizer. The strongest position is governance-first:
+
+- define standards and manifests;
+- run lint, score, audit, and eval gates;
+- manage owner, scope, risk, lifecycle, and provenance;
+- treat optimizers such as SkillOpt as possible backends for `skillops evolve --propose-only`;
+- require review, audit, and eval gates before accepting optimizer-generated patches.
+
+This keeps Oh SkillOps focused on the operational control plane for skill fleets rather than on a single optimization algorithm.
+
 ### Recommended Positioning
 
 Oh SkillOps should not start as a marketplace. Marketplaces amplify the hardest unsolved problems: redundant packages, weak trust signals, hidden permissions, prompt-injection risk, stale skills, and poor eval evidence.
@@ -339,3 +364,4 @@ The `--propose-only` posture matters: early versions should generate patches for
 - Strong: Agent Skills standard, Claude Code docs, Qwen Code repo documentation, arXiv papers.
 - Medium: Anthropic product announcement for product-level roadmap and API positioning.
 - Weak: CodeBuddy technical mechanism claims, because official source-accessible technical docs were not found during this pass. Treat Tencent/CodeBuddy as product inspiration, not as a documented Skill-as-Code governance model.
+- Naming risk: a 2026 arXiv paper is also titled "SkillOps"; keep the repository name `oh-skill-ops` distinct and emphasize the project as an open, local-first implementation and governance toolkit.

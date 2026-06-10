@@ -1,0 +1,30 @@
+version: 0.1.0
+type: trigger
+skill: repo-change-review
+description: Trigger and non-trigger cases for the repo-change-review skill.
+trials: 3
+cases:
+  - id: pre-commit-review
+    should_trigger: true
+    prompt: "Review my uncommitted changes and tell me whether they are safe to commit."
+    expected_reason: "The user asks for review of uncommitted repository changes and commit readiness."
+  - id: summarize-diff
+    should_trigger: true
+    prompt: "What changed in this repo? Check the current diff and summarize risks."
+    expected_reason: "The user asks to inspect current repository changes and identify risks."
+  - id: safety-before-commit
+    should_trigger: true
+    prompt: "Before I commit, can you check this diff for regressions and missing validation?"
+    expected_reason: "The user asks for pre-commit diff review."
+  - id: implement-feature
+    should_trigger: false
+    prompt: "Add user profile image upload support and update the API."
+    expected_reason: "The user asks for implementation, not read-only change review."
+  - id: general-code-review
+    should_trigger: false
+    prompt: "Review the authentication module for security issues."
+    expected_reason: "This asks for module review, not uncommitted repository change review."
+  - id: commit-message-only
+    should_trigger: false
+    prompt: "Write a concise commit message for the current change."
+    expected_reason: "This asks for commit message generation, not risk review."

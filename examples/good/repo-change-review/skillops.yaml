@@ -1,0 +1,31 @@
+name: repo-change-review
+owner: oh-skill-ops-maintainers
+version: 0.1.0
+runtime:
+  - claude-code
+  - codex
+  - qwen-code
+scope: project
+risk: low
+status: experimental
+skill_file: SKILL.md
+allowed_tools:
+  - read
+  - grep
+  - git-diff
+  - git-status
+disallowed_tools:
+  - write-file
+  - edit-file
+  - shell:state-changing
+  - network
+evals:
+  - evals/trigger.yaml
+  - evals/output.yaml
+provenance:
+  source: manual
+  created_from:
+    - docs/implementation-architecture.md
+    - docs/research-notes.md
+references:
+  - SKILL.md

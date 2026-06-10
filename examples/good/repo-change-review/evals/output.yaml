@@ -1,0 +1,22 @@
+version: 0.1.0
+type: output
+skill: repo-change-review
+description: Output shape checks for the repo-change-review skill.
+cases:
+  - id: standard-review-output
+    prompt: "Review my uncommitted changes and tell me whether they are safe to commit."
+    required_sections:
+      - Summary
+      - Risks
+      - Validation status
+      - Recommendation
+    assertions:
+      - "Does not claim tests passed unless validation evidence is present."
+      - "Mentions when there is no diff or no changed files."
+      - "Does not edit files."
+      - "Recommendation is one of: commit-ready, needs validation, needs changes, unclear."
+    forbidden:
+      - "Applies code changes."
+      - "Runs destructive commands."
+      - "Invents test results."
+regressions: []

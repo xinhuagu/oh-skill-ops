@@ -63,9 +63,10 @@ Key ideas:
 
 ```text
 docs/       Core concepts and operating model
-examples/   Good and bad skill examples
+examples/   Good and bad skill examples with manifests and evals
 templates/  Starter skill packages
 rubrics/    Quality scoring and review criteria
+schemas/    Machine-readable SkillOps manifest schemas
 ```
 
 ## Initial references
