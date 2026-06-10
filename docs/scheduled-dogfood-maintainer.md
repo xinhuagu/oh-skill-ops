@@ -96,24 +96,26 @@ It runs only when a dogfood issue receives the `dogfood-approved` label or when 
 
 ## Activation Requirements
 
-The workflow is safe to commit before credentials are configured. If `ANTHROPIC_API_KEY` is not present, scheduled runs skip the Claude step. Manual `workflow_dispatch` runs still dogfood the repository through a deterministic no-key fallback that creates a reviewable GitHub issue using only `GITHUB_TOKEN`.
+The workflow is safe to commit before credentials are configured. If `CLAUDE_CODE_OAUTH_TOKEN` is not present, scheduled runs skip the Claude step. Manual `workflow_dispatch` runs still dogfood the repository through a deterministic no-key fallback that creates a reviewable GitHub issue using only `GITHUB_TOKEN`.
 
-To enable it:
+To enable it with a Claude subscription token:
 
 1. Install and configure Claude Code Action for the repository.
-2. Add the repository secret `ANTHROPIC_API_KEY`, or adapt the workflow to use Claude Code OAuth or workload identity.
-3. Optionally create labels:
+2. Run `claude setup-token` locally while signed in with Claude Code.
+3. Add the generated token as the repository secret `CLAUDE_CODE_OAUTH_TOKEN`.
+4. Do not add `ANTHROPIC_API_KEY` for this project; these workflows intentionally use Claude Code OAuth from a Pro or Max subscription.
+5. Optionally create labels:
    - `dogfood`
    - `automation`
    - `needs-human-review`
    - `dogfood-approved`
-4. Keep branch protection enabled before enabling builder runs against real implementation issues.
+6. Keep branch protection enabled before enabling builder runs against real implementation issues.
 
-If workload identity is used instead of a static Anthropic API key, the workflow may need `id-token: write`. Do not add that permission unless the authentication path requires it.
+If workload identity is used later instead of Claude Code OAuth, the workflow may need `id-token: write`. Do not add that permission unless the authentication path requires it.
 
 ## No-Key Manual Fallback
 
-Manual dogfooding must not require an external model credential. When the workflow is triggered manually without `ANTHROPIC_API_KEY`, it runs a deterministic fallback that:
+Manual dogfooding must not require an external model credential. When the workflow is triggered manually without `CLAUDE_CODE_OAUTH_TOKEN`, it runs a deterministic fallback that:
 
 - creates a GitHub issue with the normal scout contract
 - records that the no-key path was used
@@ -190,7 +192,7 @@ package.json
 
 Workflow files, secrets, release settings, package publishing, and repository permissions remain human-only until the project has explicit audit rules for them.
 
-The builder requires a Claude credential. Unlike the scout, it cannot provide a meaningful no-key implementation fallback. If a builder run is started without credentials, it comments on the issue and fails visibly.
+The builder requires `CLAUDE_CODE_OAUTH_TOKEN`. Unlike the scout, it cannot provide a meaningful no-key implementation fallback. If a builder run is started without credentials, it comments on the issue and fails visibly.
 
 ## Failure Handling
 

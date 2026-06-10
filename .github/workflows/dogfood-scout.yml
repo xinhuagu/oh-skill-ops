@@ -17,7 +17,7 @@ jobs:
   scout:
     runs-on: ubuntu-latest
     env:
-      HAS_ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+      HAS_CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -25,11 +25,11 @@ jobs:
           fetch-depth: 0
 
       - name: Skip scheduled no-key run
-        if: github.event_name != 'workflow_dispatch' && env.HAS_ANTHROPIC_API_KEY != 'true'
+        if: github.event_name != 'workflow_dispatch' && env.HAS_CLAUDE_CODE_OAUTH_TOKEN != 'true'
         run: echo "Scheduled no-key run skipped. Use workflow_dispatch for deterministic fallback dogfooding."
 
       - name: Run no-key manual dogfood scout
-        if: github.event_name == 'workflow_dispatch' && env.HAS_ANTHROPIC_API_KEY != 'true'
+        if: github.event_name == 'workflow_dispatch' && env.HAS_CLAUDE_CODE_OAUTH_TOKEN != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -39,10 +39,10 @@ jobs:
 
           cat > "${body_file}" <<EOF
           Dogfood observation:
-          Manual dogfood now runs without external model credentials. The deterministic fallback found that Oh SkillOps still lacks the first local executable CLI gate: skillops lint.
+          Manual dogfood now runs without Claude Code OAuth credentials. The deterministic fallback found that Oh SkillOps still lacks the first local executable CLI gate: skillops lint.
 
           Evidence:
-          - This workflow was manually dispatched without ANTHROPIC_API_KEY and reached the no-key fallback path: ${run_url}
+          - This workflow was manually dispatched without CLAUDE_CODE_OAUTH_TOKEN and reached the no-key fallback path: ${run_url}
           - ROADMAP.md lists skillops lint, score, and audit as Milestone 1 deliverables.
           - docs/dogfooding.md still lists no skillops lint, score, or audit implementation as current gaps.
 
@@ -79,10 +79,10 @@ jobs:
             "${labels[@]}"
 
       - name: Run scheduled dogfood scout
-        if: env.HAS_ANTHROPIC_API_KEY == 'true'
+        if: env.HAS_CLAUDE_CODE_OAUTH_TOKEN == 'true'
         uses: anthropics/claude-code-action@v1
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           prompt: |
             REPO: ${{ github.repository }}
             RUN MODE: scheduled dogfood scout

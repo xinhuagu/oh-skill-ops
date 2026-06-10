@@ -5,3 +5,4 @@
 - Do not let scheduled automation self-merge or directly push project changes without human review gates.
 - Do not make external model credentials a prerequisite for starting the manual dogfood loop.
 - Do not pretend no-key automation can perform intelligent implementation work; fail visibly and request credentials instead.
+- Do not require `ANTHROPIC_API_KEY` when the maintainer explicitly wants Claude subscription-based OAuth.
