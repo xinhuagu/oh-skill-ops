@@ -42,9 +42,10 @@ The first scheduled dogfood workflow is:
 
 ```text
 .github/workflows/dogfood-scout.yml
+.github/workflows/dogfood-builder.yml
 ```
 
-It is a scout, not a builder. It can periodically inspect the repository with the dogfood loop and create a GitHub issue for human review, but it does not write repository contents, open pull requests, or merge changes.
+The scout can periodically inspect the repository with the dogfood loop and create a GitHub issue for human review. The builder is approval-gated by the `dogfood-approved` label and may create a branch and pull request, but it must not commit to `main` or merge its own work.
 
 ### Skill-as-Code
 
@@ -219,7 +220,8 @@ Open gaps:
 - no `skillops lint` implementation yet
 - no `skillops score` implementation yet
 - no `skillops audit` implementation yet
-- no approval-gated builder workflow yet
+- builder cannot run implementation work until a Claude credential is configured
+- builder path guard cannot run full SkillOps gates until the CLI exists
 - no trace format yet
 - no proposed-patch format yet
 

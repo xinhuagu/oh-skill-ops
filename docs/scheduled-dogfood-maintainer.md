@@ -11,7 +11,34 @@ Oh SkillOps should dogfood scheduled self-improvement in two stages:
 1. **Scout**: scheduled, read-mostly, issue-producing.
 2. **Builder**: approval-gated, branch-and-PR-producing.
 
-The scout stage is implemented first because it exercises the self-improvement loop while preserving a clear human review boundary.
+The scout stage was implemented first because it exercises the self-improvement loop while preserving a clear human review boundary.
+
+## End-to-End Flow
+
+```mermaid
+flowchart TD
+  A["Project changes, repo gaps, or repeated failures"] --> B["Dogfood Scout"]
+  B --> C{"Claude credential exists?"}
+  C -->|"Yes"| D["Claude reads repo context and managed skill"]
+  C -->|"No + manual trigger"| E["Deterministic no-key fallback"]
+  C -->|"No + scheduled trigger"| F["Skip to avoid noise"]
+  D --> G["Create Dogfood Scout issue"]
+  E --> G
+  G --> H["Human reviews issue"]
+  H --> I{"Approve?"}
+  I -->|"No"| J["Close, refine, or update evals/memory"]
+  I -->|"Yes"| K["Add dogfood-approved label"]
+  K --> L["Dogfood Builder"]
+  L --> M{"Claude credential exists?"}
+  M -->|"No"| N["Comment with missing credential and fail"]
+  M -->|"Yes"| O["Create branch and implement smallest next commit"]
+  O --> P["Open PR"]
+  P --> Q["Path guard and review"]
+  Q --> R{"Human merge?"}
+  R -->|"No"| S["Update rejected edits, evals, or issue"]
+  R -->|"Yes"| T["Merge PR and update memory when durable"]
+  T --> A
+```
 
 ## Why Scout First
 
@@ -59,6 +86,14 @@ permissions:
 
 That is intentional. The scout can read the repository and create an issue, but it cannot write repository contents.
 
+The approval-gated builder loop is:
+
+```text
+.github/workflows/dogfood-builder.yml
+```
+
+It runs only when a dogfood issue receives the `dogfood-approved` label or when a maintainer manually dispatches it with an issue number. It can write repository contents because it must create a branch and open a pull request, but it must not commit to `main` or self-merge.
+
 ## Activation Requirements
 
 The workflow is safe to commit before credentials are configured. If `ANTHROPIC_API_KEY` is not present, scheduled runs skip the Claude step. Manual `workflow_dispatch` runs still dogfood the repository through a deterministic no-key fallback that creates a reviewable GitHub issue using only `GITHUB_TOKEN`.
@@ -71,7 +106,8 @@ To enable it:
    - `dogfood`
    - `automation`
    - `needs-human-review`
-4. Keep branch protection enabled before adding any builder workflow.
+   - `dogfood-approved`
+4. Keep branch protection enabled before enabling builder runs against real implementation issues.
 
 If workload identity is used instead of a static Anthropic API key, the workflow may need `id-token: write`. Do not add that permission unless the authentication path requires it.
 
@@ -119,9 +155,9 @@ Bad scout outputs:
 
 ## Builder Stage
 
-The builder stage should not be added until the scout stage has produced useful issues consistently.
+The builder stage converts approved dogfood issues into pull requests. It is intentionally separate from the scout stage.
 
-When added, it should be triggered by explicit human approval, for example:
+It is triggered by explicit human approval, for example:
 
 ```text
 issue label: dogfood-approved
@@ -137,7 +173,7 @@ Builder constraints:
 - run `skillops lint`, `skillops score`, `skillops audit`, and relevant evals when those commands exist
 - include the source issue and dogfood skill in the PR body
 
-Initial allowlisted paths should be narrow:
+The builder has an allowlist. The initial allowlist includes documentation, skill packages, examples, schemas, rubrics, and the future local CLI surface:
 
 ```text
 docs/**
@@ -145,9 +181,16 @@ skills/**
 examples/**
 schemas/**
 rubrics/**
+bin/**
+src/**
+tests/**
+pyproject.toml
+package.json
 ```
 
-Workflow files, secrets, release settings, package publishing, and repository permissions should remain human-only until the project has explicit audit rules for them.
+Workflow files, secrets, release settings, package publishing, and repository permissions remain human-only until the project has explicit audit rules for them.
+
+The builder requires a Claude credential. Unlike the scout, it cannot provide a meaningful no-key implementation fallback. If a builder run is started without credentials, it comments on the issue and fails visibly.
 
 ## Failure Handling
 

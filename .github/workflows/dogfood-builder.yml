@@ -1,0 +1,137 @@
+name: Dogfood Builder
+
+"on":
+  issues:
+    types: [labeled]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Dogfood issue number to build from
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: dogfood-builder-${{ github.event.issue.number || inputs.issue_number }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || (github.event.label.name == 'dogfood-approved' && !github.event.issue.pull_request)
+    runs-on: ubuntu-latest
+    env:
+      ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue_number }}
+      HAS_ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Stop when Claude credentials are not configured
+        if: env.HAS_ANTHROPIC_API_KEY != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          gh issue comment "${ISSUE_NUMBER}" --repo "${GITHUB_REPOSITORY}" --body "Dogfood Builder did not run because no Claude credential is configured. Add ANTHROPIC_API_KEY, or adapt this workflow to Claude Code OAuth or workload identity, then rerun. Run: ${run_url}"
+          exit 1
+
+      - name: Run approved dogfood builder
+        if: env.HAS_ANTHROPIC_API_KEY == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          branch_prefix: dogfood/
+          branch_name_template: "{{prefix}}issue-${{ env.ISSUE_NUMBER }}-{{timestamp}}"
+          prompt: |
+            REPO: ${{ github.repository }}
+            ISSUE NUMBER: ${{ env.ISSUE_NUMBER }}
+            RUN MODE: approval-gated dogfood builder
+
+            You are running the Oh SkillOps Dogfood Builder.
+
+            This is an approval-gated builder run. The issue was approved by a maintainer through the dogfood-approved label or manual workflow_dispatch.
+
+            Load and use these repository files as governing context:
+            - README.md
+            - ROADMAP.md
+            - docs/dogfooding.md
+            - docs/dogfood-loop.md
+            - docs/scheduled-dogfood-maintainer.md
+            - docs/implementation-architecture.md
+            - skills/project-incubation/thesis-capture/SKILL.md
+            - skills/project-incubation/thesis-capture/skillops.yaml
+            - skills/project-incubation/thesis-capture/evals/trigger.yaml
+            - skills/project-incubation/thesis-capture/evals/output.yaml
+            - skills/project-incubation/thesis-capture/memory/accepted-lessons.md
+            - skills/project-incubation/thesis-capture/memory/rejected-edits.md
+
+            Task:
+            1. Read the approved dogfood issue with gh issue view.
+            2. Implement only the issue's Smallest next commit.
+            3. Create a branch, commit the change, push the branch, and open a pull request.
+            4. In the PR body, link the source issue and explain which managed skill and dogfood gate were used.
+            5. Do not merge the PR.
+
+            Allowed repository paths:
+            - README.md
+            - ROADMAP.md
+            - CONTRIBUTING.md
+            - docs/**
+            - skills/**
+            - examples/**
+            - schemas/**
+            - rubrics/**
+            - bin/**
+            - src/**
+            - tests/**
+            - pyproject.toml
+            - package.json
+            - package-lock.json
+            - pnpm-lock.yaml
+            - yarn.lock
+
+            Hard constraints:
+            - Do not edit .github/workflows/**.
+            - Do not edit secrets, branch protection, repository settings, releases, tags, or deployment configuration.
+            - Do not commit directly to main.
+            - Do not self-merge.
+            - Do not broaden the project into a marketplace, hosted platform, or optimizer-first tool.
+            - Do not expand scope beyond the approved issue.
+            - If the requested change requires paths outside the allowlist, stop and comment on the issue instead of editing.
+
+            Expected PR shape:
+            - Summary
+            - Source issue
+            - Dogfood gates used
+            - Validation performed
+            - Remaining risks
+          claude_args: |
+            --max-turns 20
+            --allowedTools "Read,Glob,Grep,Edit,Write,Bash(gh issue view:*),Bash(gh issue comment:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(git status:*),Bash(git diff:*),Bash(git checkout:*),Bash(git switch:*),Bash(git add:*),Bash(git commit:*),Bash(git push:*)"
+
+      - name: Validate builder path scope
+        if: env.HAS_ANTHROPIC_API_KEY == 'true'
+        run: |
+          git fetch origin main
+          bad_paths=""
+
+          for path in $(git diff --name-only origin/main...HEAD); do
+            case "${path}" in
+              README.md|ROADMAP.md|CONTRIBUTING.md|docs/*|skills/*|examples/*|schemas/*|rubrics/*|bin/*|src/*|tests/*|pyproject.toml|package.json|package-lock.json|pnpm-lock.yaml|yarn.lock)
+                ;;
+              *)
+                echo "::error file=${path}::Path is outside the Dogfood Builder allowlist"
+                bad_paths="${bad_paths} ${path}"
+                ;;
+            esac
+          done
+
+          if [ -n "${bad_paths}" ]; then
+            exit 1
+          fi
