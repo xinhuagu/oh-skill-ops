@@ -1,0 +1,27 @@
+version: 0.1.0
+type: output
+skill: project-thesis-capture
+description: Output shape checks for the project-thesis-capture skill.
+cases:
+  - id: standard-thesis-capture-output
+    prompt: "I want to build a project around Skill-as-Code, self-improving skills, and skill standards. Help me turn this into a repo direction."
+    required_sections:
+      - Project thesis
+      - Core commitments
+      - Non-goals
+      - Differentiators
+      - Repository artifacts to create or update
+      - Open questions
+      - Smallest next commit
+    assertions:
+      - "Preserves the user's stated intent instead of replacing it with a generic startup idea."
+      - "Separates source-backed facts from assumptions when external claims are involved."
+      - "Identifies at least one concrete repository artifact, not only abstract positioning."
+      - "Includes non-goals to prevent scope creep."
+      - "Does not recommend a marketplace, hosted platform, or optimizer-first implementation by default."
+    forbidden:
+      - "Invents citations or source-backed claims."
+      - "Silently expands the project into SaaS or marketplace scope."
+      - "Makes external-service changes."
+      - "Treats runtime feedback as permission to mutate production skills directly."
+regressions: []

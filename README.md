@@ -69,6 +69,7 @@ Key ideas:
 
 ```text
 docs/       Core concepts and operating model
+skills/     Dogfooded project-development skills
 examples/   Good and bad skill examples with manifests and evals
 templates/  Starter skill packages
 rubrics/    Quality scoring and review criteria

@@ -1,0 +1,34 @@
+name: project-thesis-capture
+owner: oh-skill-ops-maintainers
+version: 0.1.0
+runtime:
+  - claude-code
+  - codex
+  - qwen-code
+scope: project
+risk: medium
+status: experimental
+skill_file: SKILL.md
+allowed_tools:
+  - read
+  - grep
+  - web-research
+  - write-docs
+disallowed_tools:
+  - deployment
+  - secrets
+  - production-data
+  - destructive-shell
+  - external-service-mutation
+evals:
+  - evals/trigger.yaml
+  - evals/output.yaml
+provenance:
+  source: manual
+  created_from:
+    - docs/dogfooding.md
+    - docs/implementation-architecture.md
+    - docs/research-notes.md
+references:
+  - SKILL.md
+  - docs/dogfooding.md

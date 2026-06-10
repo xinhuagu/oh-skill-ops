@@ -14,9 +14,27 @@ The goal is to avoid becoming a methodology-only repository. A standard matters 
 
 ## Current Dogfood Artifacts
 
+### Process Dogfood
+
+The first dogfooded project-development skill is:
+
+```text
+skills/project-incubation/thesis-capture/
+  SKILL.md
+  skillops.yaml
+  evals/
+    trigger.yaml
+    output.yaml
+  memory/
+    accepted-lessons.md
+    rejected-edits.md
+```
+
+This skill captures the process we used to turn the original idea into a repository thesis: Skill-as-Code, Self-improving Skills, and Skill Standards. It makes the project creation process itself a managed skill package.
+
 ### Skill-as-Code
 
-The first managed skill package is:
+The first managed example skill package is:
 
 ```text
 examples/good/repo-change-review/
@@ -27,12 +45,13 @@ examples/good/repo-change-review/
     output.yaml
 ```
 
-This package demonstrates the minimum SkillOps unit:
+These packages demonstrate the minimum SkillOps unit:
 
 - `SKILL.md`: runtime skill instructions.
 - `skillops.yaml`: operational sidecar manifest.
 - `evals/trigger.yaml`: should-trigger and should-not-trigger cases.
 - `evals/output.yaml`: expected output shape and forbidden behavior.
+- `memory/`: accepted lessons and rejected edits when a process skill starts evolving.
 
 ### Skill Standards
 
@@ -100,9 +119,9 @@ Research notes separate source facts, interpretation, project implications, and 
 
 The project should follow these rules for its own changes.
 
-### 1. New Skill Examples Need Manifests
+### 1. Managed Skills Need Manifests
 
-Any new skill example under `examples/good/` should include a `skillops.yaml` manifest.
+Any new managed skill under `skills/` or good example under `examples/good/` should include a `skillops.yaml` manifest.
 
 Minimum expectation:
 
@@ -161,6 +180,9 @@ The first `skillops` CLI implementation should be validated against this reposit
 Initial dogfood commands:
 
 ```bash
+skillops lint skills/project-incubation/thesis-capture
+skillops score skills/project-incubation/thesis-capture
+skillops audit skills/project-incubation/thesis-capture
 skillops lint examples/good/repo-change-review
 skillops score examples/good/repo-change-review
 skillops audit examples/good/repo-change-review
@@ -169,6 +191,7 @@ skillops audit examples/good/repo-change-review
 Later:
 
 ```bash
+skillops eval skills/project-incubation/thesis-capture
 skillops eval examples/good/repo-change-review
 skillops evolve --from traces/session.json --propose-only
 ```

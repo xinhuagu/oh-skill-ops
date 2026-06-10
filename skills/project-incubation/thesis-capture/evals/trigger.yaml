@@ -1,0 +1,30 @@
+version: 0.1.0
+type: trigger
+skill: project-thesis-capture
+description: Trigger and non-trigger cases for the project-thesis-capture skill.
+trials: 3
+cases:
+  - id: raw-project-idea
+    should_trigger: true
+    prompt: "I want to start a GitHub project about Skill-as-Code, self-improving skills, and skill standards. Help me shape the direction."
+    expected_reason: "The user is starting a project and needs a raw idea converted into thesis and artifacts."
+  - id: reshape-existing-project
+    should_trigger: true
+    prompt: "Read this repo direction and help me clarify the thesis, non-goals, and next implementation step."
+    expected_reason: "The user is reshaping project direction and asks for thesis and implementation framing."
+  - id: dogfood-process
+    should_trigger: true
+    prompt: "Can the process of creating this project itself become a managed skill? Turn that into something we can dogfood."
+    expected_reason: "The user asks to convert a project-development process into a governed skill artifact."
+  - id: code-bug
+    should_trigger: false
+    prompt: "Fix the failing TypeScript test in the CLI parser."
+    expected_reason: "The user asks for a code fix, not thesis capture or project incubation."
+  - id: security-audit
+    should_trigger: false
+    prompt: "Audit this skill for prompt injection and dangerous permissions."
+    expected_reason: "The user asks for security review, which belongs to a security audit skill."
+  - id: commit-message
+    should_trigger: false
+    prompt: "Write a commit message for the current diff."
+    expected_reason: "The user asks for commit message generation, not project thesis capture."
