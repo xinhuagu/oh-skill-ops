@@ -2,6 +2,14 @@
 
 Skill-as-Code operations for AI agents: author, test, govern, and evolve reusable agent skills.
 
+## Thesis
+
+Oh SkillOps is built on three commitments:
+
+- **Skill-as-Code**: skills should be versioned, reviewed, tested, released, and deprecated like production code.
+- **Self-improving Skills**: skills should improve from traces, failures, evals, and feedback through proposed, reviewed, and versioned patches.
+- **Skill Standards**: skills need clear structure, metadata, scope, permissions, evals, lifecycle states, and safety rules.
+
 Oh SkillOps is an open project for treating agent skills as production-grade software assets. A skill is not just a prompt. It is a versioned package of instructions, metadata, examples, scripts, permissions, and evaluation evidence that changes how an AI agent behaves.
 
 ## Why this exists
