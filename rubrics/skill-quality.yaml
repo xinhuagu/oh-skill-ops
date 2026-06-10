@@ -1,0 +1,44 @@
+version: 0.1.0
+name: skill-quality-rubric
+max_score: 100
+categories:
+  trigger_precision:
+    weight: 20
+    checks:
+      - description states what the skill does
+      - description states when to use it
+      - description avoids broad catch-all wording
+      - non-use boundaries are included when confusion is likely
+  procedural_clarity:
+    weight: 20
+    checks:
+      - instructions are ordered and actionable
+      - inputs and outputs are clear
+      - failure behavior is defined
+      - long background material is moved out of SKILL.md
+  tool_and_permission_safety:
+    weight: 20
+    checks:
+      - expected tools are justified
+      - state-changing behavior is explicit
+      - dangerous actions require approval
+      - secrets and sensitive data handling are constrained
+  testability:
+    weight: 20
+    checks:
+      - at least one happy-path eval exists or is described
+      - at least one non-trigger case exists or is described
+      - output can be checked against a stable shape
+      - regressions can be replayed
+  maintainability:
+    weight: 20
+    checks:
+      - owner is known
+      - version or lifecycle state is known
+      - supporting files are referenced clearly
+      - examples are current and minimal
+ratings:
+  approved: "85-100"
+  review: "70-84"
+  experimental: "50-69"
+  blocked: "0-49"
