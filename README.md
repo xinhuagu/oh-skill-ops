@@ -14,7 +14,7 @@ Oh SkillOps is built on three commitments:
 
 Oh SkillOps is dogfooded on itself. The repository is not only a description of SkillOps; it is the first SkillOps-managed skill ecosystem. Every core concept is expressed as repository-native files: schemas, manifests, evals, rubrics, security checklists, roadmap gates, and reviewable commits.
 
-See [Dogfooding](docs/dogfooding.md) for how the project uses its own standards.
+See [Dogfooding](docs/dogfooding.md) and [Scheduled Dogfood Maintainer](docs/scheduled-dogfood-maintainer.md) for how the project uses its own standards.
 
 Oh SkillOps is an open project for treating agent skills as production-grade software assets. A skill is not just a prompt. It is a versioned package of instructions, metadata, examples, scripts, permissions, and evaluation evidence that changes how an AI agent behaves.
 

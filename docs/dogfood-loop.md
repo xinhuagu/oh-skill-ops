@@ -20,6 +20,8 @@ project-development task
 
 The loop should not silently mutate production skills. Runtime feedback may suggest improvements, but accepted changes must be reviewable commits.
 
+Scheduled automation follows the same rule. The first scheduled workflow is a scout that creates reviewable issues, not repository changes. See [Scheduled Dogfood Maintainer](scheduled-dogfood-maintainer.md).
+
 ## First Managed Process Skill
 
 The first process skill is:

@@ -1,0 +1,81 @@
+name: Dogfood Scout
+
+"on":
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: dogfood-scout
+  cancel-in-progress: false
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    env:
+      HAS_ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Skip when Claude credentials are not configured
+        if: env.HAS_ANTHROPIC_API_KEY != 'true'
+        run: echo "Set ANTHROPIC_API_KEY to enable the scheduled dogfood scout."
+
+      - name: Run scheduled dogfood scout
+        if: env.HAS_ANTHROPIC_API_KEY == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            RUN MODE: scheduled dogfood scout
+
+            You are running the Oh SkillOps scheduled dogfood scout.
+
+            Load and use these repository files as the governing context:
+            - README.md
+            - ROADMAP.md
+            - docs/dogfooding.md
+            - docs/dogfood-loop.md
+            - docs/scheduled-dogfood-maintainer.md
+            - docs/implementation-architecture.md
+            - skills/project-incubation/thesis-capture/SKILL.md
+            - skills/project-incubation/thesis-capture/skillops.yaml
+            - skills/project-incubation/thesis-capture/evals/trigger.yaml
+            - skills/project-incubation/thesis-capture/evals/output.yaml
+            - skills/project-incubation/thesis-capture/memory/accepted-lessons.md
+            - skills/project-incubation/thesis-capture/memory/rejected-edits.md
+
+            Task:
+            1. Inspect the repository for one concrete gap where Oh SkillOps is not yet dogfooding its own Skill-as-Code, Self-improving Skills, or Skill Standards thesis.
+            2. Prefer gaps that can become a small reviewable commit.
+            3. Create or update one GitHub issue titled "Dogfood Scout: ${{ github.run_id }}".
+            4. Use this issue body shape:
+
+               Dogfood observation:
+               Evidence:
+               Relevant managed skill:
+               Proposed repository artifact:
+               Risk and scope:
+               Suggested gates:
+               Smallest next commit:
+
+            Hard constraints:
+            - Do not edit repository files.
+            - Do not create branches, commits, pull requests, releases, tags, or deployments.
+            - Do not change secrets, workflow permissions, branch protection, or repository settings.
+            - Do not propose self-merge.
+            - Do not broaden the project into a marketplace, hosted platform, or optimizer-first tool.
+            - If labels such as dogfood, automation, or needs-human-review exist, use them. If they do not exist, create the issue without labels.
+
+            Success means a human maintainer can review the issue and decide whether to approve a later builder workflow.
+          claude_args: |
+            --max-turns 8
+            --allowedTools "Read,Glob,Grep,Bash(gh issue:*),Bash(git status:*),Bash(git log:*),Bash(git diff:*)"

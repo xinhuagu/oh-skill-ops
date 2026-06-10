@@ -14,6 +14,8 @@ The goal is to avoid becoming a methodology-only repository. A standard matters 
 
 The manual operating loop is defined in [Dogfood Loop](dogfood-loop.md).
 
+The scheduled operating loop is defined in [Scheduled Dogfood Maintainer](scheduled-dogfood-maintainer.md).
+
 ## Current Dogfood Artifacts
 
 ### Process Dogfood
@@ -33,6 +35,16 @@ skills/project-incubation/thesis-capture/
 ```
 
 This skill captures the process we used to turn the original idea into a repository thesis: Skill-as-Code, Self-improving Skills, and Skill Standards. It makes the project creation process itself a managed skill package.
+
+### Scheduled Dogfood
+
+The first scheduled dogfood workflow is:
+
+```text
+.github/workflows/dogfood-scout.yml
+```
+
+It is a scout, not a builder. It can periodically inspect the repository with the dogfood loop and create a GitHub issue for human review, but it does not write repository contents, open pull requests, or merge changes.
 
 ### Skill-as-Code
 
@@ -207,7 +219,7 @@ Open gaps:
 - no `skillops lint` implementation yet
 - no `skillops score` implementation yet
 - no `skillops audit` implementation yet
-- no GitHub Actions workflow yet
+- no approval-gated builder workflow yet
 - no trace format yet
 - no proposed-patch format yet
 
